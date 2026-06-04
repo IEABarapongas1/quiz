@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.vite/
+
+# Variáveis de ambiente (credenciais) — nunca commitar
+.env
+.env.local
+.env.*.local
+
+# Config local do Claude Code (pode conter segredos em permissões)
+.claude/settings.local.json

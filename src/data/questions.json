@@ -1,0 +1,127 @@
+[
+  {
+    "id": 1,
+    "level": 1,
+    "question": "O que é o Claude Code?",
+    "options": [
+      "Um editor de texto criado pela Anthropic",
+      "Uma ferramenta de linha de comando que permite delegar tarefas de codificação ao Claude diretamente do terminal",
+      "Um plugin do VS Code para autocompletar código",
+      "Uma linguagem de programação proprietária da Anthropic"
+    ],
+    "correctIndex": 1,
+    "explanation": "Claude Code é um CLI (Command Line Interface) que conecta o modelo Claude ao ambiente de desenvolvimento do usuário, permitindo que ele execute tarefas de engenharia de forma autônoma."
+  },
+  {
+    "id": 2,
+    "level": 1,
+    "question": "Qual é o principal benefício do Claude Code para equipes de negócio?",
+    "options": [
+      "Substitui completamente a equipe de engenharia",
+      "Gera relatórios financeiros automaticamente",
+      "Acelera a entrega de software ao automatizar tarefas repetitivas de codificação",
+      "Faz deploy de aplicações em qualquer cloud sem configuração"
+    ],
+    "correctIndex": 2,
+    "explanation": "Claude Code aumenta a produtividade dos times de engenharia ao assumir tarefas como refatoração, escrita de testes e geração de código boilerplate, liberando os desenvolvedores para trabalho de maior valor."
+  },
+  {
+    "id": 3,
+    "level": 1,
+    "question": "Claude Code é um produto de qual empresa?",
+    "options": ["OpenAI", "Google DeepMind", "Microsoft", "Anthropic"],
+    "correctIndex": 3,
+    "explanation": "Claude Code é desenvolvido e mantido pela Anthropic, a mesma empresa por trás do modelo de IA Claude."
+  },
+  {
+    "id": 4,
+    "level": 1,
+    "question": "Em qual ambiente o Claude Code opera primariamente?",
+    "options": [
+      "Interface web do navegador",
+      "Terminal / linha de comando",
+      "Aplicativo mobile",
+      "Planilhas do Google"
+    ],
+    "correctIndex": 1,
+    "explanation": "Claude Code é uma ferramenta CLI — o usuário interage com ela diretamente no terminal, o que permite integração nativa com o sistema de arquivos, Git e outras ferramentas do desenvolvedor."
+  },
+  {
+    "id": 5,
+    "level": 1,
+    "question": "Qual das afirmações melhor descreve o modelo de operação do Claude Code?",
+    "options": [
+      "O usuário digita código e o Claude revisa",
+      "O Claude sugere snippets que o usuário copia manualmente",
+      "O Claude age como um agente autônomo que lê arquivos, escreve código e executa comandos com supervisão do usuário",
+      "O Claude apenas responde perguntas sobre documentação"
+    ],
+    "correctIndex": 2,
+    "explanation": "Claude Code opera em modo agêntico — ele pode ler e escrever arquivos, executar comandos no terminal e iterar sobre sua própria saída, sempre com o desenvolvedor no controle."
+  },
+  {
+    "id": 6,
+    "level": 2,
+    "question": "O que são \"hooks\" no Claude Code?",
+    "options": [
+      "Atalhos de teclado para abrir o terminal",
+      "Scripts de integração com GitHub Actions",
+      "Mecanismos que permitem executar código customizado em eventos do ciclo de vida do agente (ex: antes/depois de um tool call)",
+      "Aliases de comandos do shell"
+    ],
+    "correctIndex": 2,
+    "explanation": "Hooks permitem que o usuário injete lógica personalizada em pontos específicos da execução do Claude Code, como validar outputs ou disparar notificações após uma ação."
+  },
+  {
+    "id": 7,
+    "level": 2,
+    "question": "O que é um MCP Server no contexto do Claude Code?",
+    "options": [
+      "Um servidor de métricas de performance do Claude",
+      "Um protocolo que expõe ferramentas e contexto externo para o agente via uma interface padronizada",
+      "Um serviço de autenticação da Anthropic",
+      "Um tipo de banco de dados vetorial usado pelo Claude"
+    ],
+    "correctIndex": 1,
+    "explanation": "MCP (Model Context Protocol) é um padrão aberto que permite conectar fontes de dados e ferramentas externas (ex: Slack, banco de dados, APIs) ao Claude Code de forma plug-and-play."
+  },
+  {
+    "id": 8,
+    "level": 2,
+    "question": "Qual flag permite que o Claude Code execute ações sem pedir confirmação ao usuário a cada passo?",
+    "options": [
+      "--silent",
+      "--fast",
+      "--no-confirm",
+      "--dangerously-skip-permissions"
+    ],
+    "correctIndex": 3,
+    "explanation": "A flag --dangerously-skip-permissions desabilita os prompts de confirmação, útil em pipelines de CI/CD, mas deve ser usada com cautela pois o Claude terá autonomia total sobre o ambiente."
+  },
+  {
+    "id": 9,
+    "level": 2,
+    "question": "Como o Claude Code gerencia contexto em projetos grandes que excedem sua janela de contexto?",
+    "options": [
+      "Ele ignora arquivos antigos automaticamente",
+      "Usa um banco de dados externo obrigatório",
+      "Trunca o código para caber na janela",
+      "Usa arquivos como CLAUDE.md e leitura seletiva de arquivos relevantes para manter o contexto eficiente"
+    ],
+    "correctIndex": 3,
+    "explanation": "O Claude Code lê arquivos CLAUDE.md (documentação do projeto), usa buscas por padrão e carrega apenas os arquivos relevantes para a tarefa atual, otimizando o uso da janela de contexto."
+  },
+  {
+    "id": 10,
+    "level": 2,
+    "question": "O que é um \"slash command\" customizado no Claude Code?",
+    "options": [
+      "Um comando do sistema operacional exposto ao Claude",
+      "Um atalho de terminal definido pelo usuário no .bashrc",
+      "Um comando definido em arquivos .md dentro da pasta .claude/commands/ que encapsula prompts reutilizáveis",
+      "Uma integração com a API REST da Anthropic"
+    ],
+    "correctIndex": 2,
+    "explanation": "Slash commands customizados são arquivos Markdown em .claude/commands/ que o usuário pode invocar com /nome-do-comando para executar workflows pré-definidos, como revisar PRs ou rodar análises de segurança."
+  }
+]
