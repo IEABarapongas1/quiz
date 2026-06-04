@@ -2,10 +2,12 @@ node_modules/
 dist/
 .vite/
 
-# Variáveis de ambiente (credenciais) — nunca commitar
+# Variáveis de ambiente locais (podem conter segredos) — nunca commitar
 .env
 .env.local
 .env.*.local
+# Obs: .env.production É versionado de propósito (só contém URL + chave anon,
+# ambas públicas e protegidas por RLS). Nunca coloque service_role/senha nele.
 
 # Config local do Claude Code (pode conter segredos em permissões)
 .claude/settings.local.json
