@@ -14,7 +14,7 @@
 | Objetivo | Métrica de sucesso |
 |---|---|
 | Educar o mercado sobre Claude Code | ≥ 70% dos usuários completam o quiz |
-| Diferenciar nível de conhecimento por perfil | Taxa de acerto por nível registrada no backend |
+| Diferenciar nível de conhecimento por perfil | Taxa de acerto por nível registrada no Supabase |
 | Gerar engajamento e compartilhamento | Usuário recebe gabarito completo e pode revisitar |
 | Base para trilha de aprendizado futura | PRD prevê extensão para módulos adicionais |
 
@@ -31,7 +31,7 @@
 - Tela de resultado ao final com:
   - Pontuação total (ex: 8/10)
   - Gabarito completo com a resposta correta e uma explicação curta por questão
-- **Persistência de resultados no backend** (score, acertos por nível, timestamp)
+- **Persistência de resultados no Supabase** (score, acertos por nível, timestamp)
 - Identidade visual alinhada à marca Anthropic/Claude (cores: preto, branco, laranja/coral)
 
 ### 3.2 Fora do escopo (v1.0)
@@ -161,7 +161,7 @@
 | RF-05 | Ao finalizar, exibir score (ex: "7 de 10 corretas") |
 | RF-06 | Exibir gabarito completo: cada pergunta com a alternativa certa destacada e uma explicação |
 | RF-07 | Botão "Tentar novamente" na tela de resultado |
-| RF-08 | Persistir resultado no backend: score total, acertos por nível e timestamp |
+| RF-08 | Persistir resultado no Supabase: score total, acertos por nível e timestamp |
 | RF-09 | Tratar erros de rede (falha no save) com feedback visual não-bloqueante |
 
 ## 6. Requisitos não-funcionais
@@ -185,10 +185,11 @@
 | Frontend | React 18 + Vite |
 | Estilização | Tailwind CSS |
 | Roteamento | React Router v6 |
-| HTTP Client | fetch nativo (ou axios) |
-| Backend | Node.js + Express (REST API simples) |
-| Banco de dados | SQLite (desenvolvimento) / PostgreSQL (produção) |
-| ORM | Prisma |
+| Acesso a dados | `@supabase/supabase-js` (client direto, sem backend próprio) |
+| Banco de dados | Supabase (PostgreSQL gerenciado) |
+| Segurança de dados | Row Level Security (RLS) + chave publishable/anon |
+
+> **Nota de evolução:** a v1.0 inicial previa um backend Express/Prisma com SQLite/PostgreSQL. A persistência foi migrada para o **Supabase**, com o frontend gravando direto no banco via RLS. O backend Express foi aposentado.
 
 ### 7.2 Estrutura de pastas (frontend)
 
@@ -205,61 +206,46 @@ quiz/
 │   ├── data/
 │   │   └── questions.json        # perguntas, alternativas, gabarito, explicações
 │   ├── hooks/
-│   │   └── useQuiz.js            # lógica de estado do quiz
+│   │   └── useQuiz.jsx           # lógica de estado do quiz (Context)
 │   ├── services/
-│   │   └── api.js                # chamadas ao backend
+│   │   ├── supabase.js           # client do Supabase
+│   │   └── api.js                # saveResult / getResult (acesso a dados)
+│   ├── components/
+│   │   └── ErrorBoundary.jsx     # fallback global de erros
 │   ├── App.jsx
 │   └── main.jsx
+├── supabase/
+│   ├── schema.sql                # tabela quiz_results + RLS + grants
+│   └── apply-schema.mjs          # helper de migração
+├── .env                          # credenciais (não versionado)
 ├── index.html
 ├── vite.config.js
 └── tailwind.config.js
 ```
 
-### 7.3 Estrutura de pastas (backend)
+### 7.3 Modelo de dados (Supabase / PostgreSQL)
 
-```
-quiz-api/
-├── prisma/
-│   └── schema.prisma
-├── src/
-│   ├── routes/
-│   │   └── results.js
-│   ├── controllers/
-│   │   └── resultsController.js
-│   └── index.js
-├── .env
-└── package.json
-```
+Tabela `public.quiz_results` (definição canônica em `supabase/schema.sql`):
 
-### 7.4 Modelo de dados
-
-```prisma
-model QuizResult {
-  id          String   @id @default(uuid())
-  sessionId   String   // UUID anônimo gerado no client
-  totalScore  Int
-  level1Score Int      // acertos no nível iniciante (0-5)
-  level2Score Int      // acertos no nível avançado (0-5)
-  completedAt DateTime @default(now())
-}
+```sql
+create table public.quiz_results (
+  id           uuid        primary key default gen_random_uuid(),
+  session_id   text        not null,   -- UUID anônimo gerado no client
+  total_score  integer     not null,   -- 0-10
+  level1_score integer     not null,   -- acertos no nível iniciante (0-5)
+  level2_score integer     not null,   -- acertos no nível avançado (0-5)
+  completed_at timestamptz not null default now()
+);
 ```
 
-### 7.5 API Endpoints
+RLS habilitado: `grant insert` + policy `anon_insert_results` permitem gravação anônima; SELECT fica bloqueado por padrão (segurança da chave pública).
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `POST` | `/api/results` | Salva o resultado de uma sessão |
-| `GET` | `/api/results/:sessionId` | Recupera resultado de uma sessão específica |
+### 7.4 Acesso a dados (Supabase)
 
-**Payload POST `/api/results`:**
-```json
-{
-  "sessionId": "uuid-gerado-no-client",
-  "totalScore": 7,
-  "level1Score": 4,
-  "level2Score": 3
-}
-```
+Sem API REST própria — o frontend usa `supabase-js` (`services/api.js`):
+
+- `saveResult({ sessionId, totalScore, level1Score, level2Score })` → `insert` em `quiz_results` (mapeado para colunas snake_case). Best-effort: nunca lança, retorna `{ ok, error? }`.
+- `getResult(sessionId)` → `select` por `session_id` (requer habilitar a policy de SELECT em `schema.sql`).
 
 ---
 
@@ -305,8 +291,8 @@ Tela de Resultado
 | AC-01 | O quiz exibe exatamente 10 perguntas em sequência correta |
 | AC-02 | Cada pergunta tem exatamente 4 alternativas |
 | AC-03 | A tela de resultado mostra score correto e gabarito completo |
-| AC-04 | O resultado é salvo via POST no backend após conclusão |
-| AC-05 | Em caso de falha no POST, o usuário vê mensagem de aviso mas não é bloqueado |
+| AC-04 | O resultado é salvo no Supabase (insert em `quiz_results`) após conclusão |
+| AC-05 | Em caso de falha no save, o usuário vê mensagem de aviso mas não é bloqueado |
 | AC-06 | O quiz funciona corretamente em Chrome, Firefox e Safari (desktop e mobile) |
 | AC-07 | A aplicação passa em Lighthouse Performance ≥ 80 |
 
